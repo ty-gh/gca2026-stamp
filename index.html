@@ -184,7 +184,7 @@
   /* 賞状 */
   .cert { display: none; }
   .cert.show { display: block; }
-  .cert img { width: 100%; height: auto; display: block; border: 3px solid var(--ink); border-radius: 10px; background: #fff; box-shadow: 5px 5px 0 rgba(31, 34, 56, .18); }
+  .cert img { width: 100%; height: auto; aspect-ratio: 1200 / 850; display: block; border: 3px solid var(--ink); border-radius: 10px; background: #fff; box-shadow: 5px 5px 0 rgba(31, 34, 56, .18); }   /* 画像が来る前から高さを確保して、位置がずれないように */
   .cert .lead { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
   .cert.pop { animation: pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
   @keyframes pop { from { opacity: 0; transform: scale(.86) translateY(20px); } to { opacity: 1; transform: none; } }
@@ -544,7 +544,7 @@
   $('skipName').addEventListener('click', function () { startWith(''); });
 
   // ---- 完成の演出 ----
-  var finaleTimer = null;
+  var finaleTimer = null, finaleShownAt = 0;
   function confetti() {
     var box = $('confetti'), colors = ['#f6a97f', '#cbb8ef', '#f3d98b', '#3557d4', '#f6a97f'];
     for (var i = 0; i < 48; i++) {
@@ -561,6 +561,7 @@
   function showFinale() {
     var f = $('finale');
     f.classList.remove('leave'); f.classList.add('show');
+    finaleShownAt = Date.now();
     clearTimeout(finaleTimer);
     finaleTimer = setTimeout(endFinale, 5200);
   }
@@ -573,9 +574,15 @@
     var cert = $('cert');
     cert.classList.remove('pop'); void cert.offsetWidth; cert.classList.add('pop');
     confetti();
-    setTimeout(function () { cert.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 150);
+    // 賞状の位置へ。scrollIntoView はキーボードが閉じる途中の画面の高さや登場の動き（transform）に引きずられて
+    // 位置がぶれるので、レイアウト上の座標で決める
+    setTimeout(function () { window.scrollTo({ top: Math.max(0, layoutTop(cert) - 12), behavior: 'smooth' }); }, 150);
   }
-  $('finale').addEventListener('click', endFinale);
+  function layoutTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  $('finale').addEventListener('click', function () {
+    if (Date.now() - finaleShownAt < 700) return;   // 「押す」の直後の二度タップで消えないように
+    endFinale();
+  });
 
   function buildSlots() {
     slotsEl.innerHTML = '';
