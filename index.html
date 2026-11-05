@@ -109,8 +109,8 @@
   /* 見出し */
   header.top { padding: calc(36px + env(safe-area-inset-top)) 0 0; }
   header.top .wrap { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
-  h1 { font-size: clamp(24px, 7.6vw, 30px); font-weight: 900; line-height: 1.2; letter-spacing: .02em; margin-top: 6px; white-space: nowrap; }
-  h1 small { display: block; font-size: 12px; font-weight: 700; color: var(--dim); margin-top: 6px; letter-spacing: .04em; }
+  h1 { font-size: clamp(21px, 6.4vw, 26px); font-weight: 900; line-height: 1.25; letter-spacing: .02em; margin-top: 6px; white-space: nowrap; }
+  h1 small { display: block; font: 500 11px/1 var(--font-en); letter-spacing: .3em; text-transform: uppercase; color: var(--dim); margin-top: 8px; }
   .who { display: none; flex: none; font: 700 13px/1 var(--font-jp); color: var(--ink); background: var(--butter); border-radius: 999px; padding: 8px 14px; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .who.show { display: block; }
 
@@ -123,7 +123,8 @@
   .card .head .count { font: 700 15px/1 var(--font-en); color: var(--dim); letter-spacing: .06em; }
 
   /* ステージの丸 5 つ（PDF「ステージは 5 つ。」の型）。点線でつなぐ */
-  .slots { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; overflow: hidden; padding: 6px 2px 2px; }
+  /* 判子は丸より外にはみ出す（inset -12px＋傾き）ので、ここでは切らない。画面の外は .sheet の overflow: hidden が切る */
+  .slots { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 8px 0 2px; }
   .slots::before { content: ""; position: absolute; left: 12%; right: 12%; top: calc(6px + (100% - 6px) * 0); height: 0; }
   .slot { text-align: center; position: relative; }
   .circle {
@@ -145,6 +146,7 @@
   }
   .stamp svg { width: 100%; height: 100%; display: block; color: var(--accent); }
   .slot.done .circle .n { visibility: hidden; }
+  .slot:nth-child(5).done .circle { background: #d3dbf8; }   /* 5 つ目はコバルトの丸にコバルトの判子なので、押したら薄い青にして印影を見せる */
   .slot.done .stamp { display: flex; }
   .slot.done.fresh .stamp { animation: press .45s cubic-bezier(.2,1.6,.4,1) both; }
   @keyframes press {
@@ -205,9 +207,9 @@
   .cover .deco-bl { left: -230px; bottom: -200px; }
   svg .float, svg .twinkle { transform-box: fill-box; transform-origin: center; }
   .cover .blob-main { width: 56%; aspect-ratio: 1; left: 22%; top: 2%; background: var(--peach); }
-  .cover h1 { font-size: 38px; }
+  .cover h1 { font-size: clamp(26px, 8.4vw, 34px); }
   .cover p { font-size: 16px; color: var(--dim); margin-top: 14px; }
-  .cover label { display: block; font: 500 12px/1 var(--font-en); letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin: 26px 0 8px; }
+  .cover label { display: block; font: 500 12px/1 var(--font-en); letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin: 30px 0 8px; }
   .cover .skip { display: block; width: 100%; background: none; border: 0; color: var(--dim); text-decoration: underline; font-size: 14px; padding: 14px 0 0; }
   main.enter { animation: screenIn .6s ease both; }
 
@@ -302,9 +304,8 @@
         <g class="twinkle" style="animation-delay:-1.3s"><svg x="316" y="16" width="30" height="30" style="--body: var(--butter)"><use href="#star" width="30" height="30"/></svg></g>
       </svg>
     </div>
-    <h1>スタンプ集め<small>スイッチだけで足し算を作る</small></h1>
+    <h1>親子で学ぶ、<br>半導体の世界。<small>Semiconductor Workshop</small></h1>
     <svg class="squiggle" viewBox="0 0 150 14" aria-hidden="true"><path pathLength="1" d="M3 8 C 15 -2, 25 18, 38 8 S 60 -2, 73 8 S 95 18, 108 8 S 130 -2, 147 8"/></svg>
-    <p>合言葉を入れて、<span class="hl">スタンプを 5 つ</span>集めよう。</p>
     <label for="nameInput">Name</label>
     <input id="nameInput" type="text" maxlength="12" placeholder="なまえ（ニックネームでも OK）" autocapitalize="off" autocorrect="off" spellcheck="false">
     <button class="btn block" type="submit">はじめる</button>
@@ -334,7 +335,7 @@
     <div class="wrap">
       <div>
         <div class="caps kicker">Stamp Rally</div>
-        <h1>スタンプ集め<small>スイッチだけで足し算を作る</small></h1>
+        <h1>親子で学ぶ、<br>半導体の世界。<small>Semiconductor Workshop</small></h1>
         <svg class="squiggle" viewBox="0 0 150 14" aria-hidden="true"><path pathLength="1" d="M3 8 C 15 -2, 25 18, 38 8 S 60 -2, 73 8 S 95 18, 108 8 S 130 -2, 147 8"/></svg>
       </div>
       <div class="who" id="who"></div>
@@ -598,7 +599,7 @@
     $('count').textContent = n + ' / 5';
     var dots = $('dots').querySelectorAll('i');
     for (var k = 0; k < dots.length; k++) dots[k].classList.toggle('on', !!data.stamps[k]);
-    $('pill4').textContent = data.stamps[4] ? STAGES[4].name : '?';   // ⑤ は押すまで「?」（スライドと同じ）
+    STAGES.forEach(function (st, i) { $('pill' + i).textContent = data.stamps[i] ? st.name : '?'; });   // 札は押すまで「?」
     if (n === 5) {
       $('cert').classList.add('show');
       $('entry').style.display = 'none';
@@ -786,7 +787,7 @@
       y0 += 62;
     }
     ctx.fillStyle = ink; ctx.font = '900 36px ' + jp;
-    ctx.fillText('スイッチだけで足し算を作る', W / 2, y0);
+    ctx.fillText('親子で学ぶ、半導体の世界。', W / 2, y0);
     ctx.fillStyle = dim; ctx.font = '500 24px ' + jp;
     ctx.fillText((name ? '' : 'あなたは ') + '5 つの台をすべて組み上げ、計算する部品「半加算器」を', W / 2, y0 + 50);
     ctx.fillText('完成させました。その成果をたたえ、これを賞します。', W / 2, y0 + 86);
