@@ -64,9 +64,11 @@
   button { cursor: pointer; }
 
   /* 紙 1 枚 */
-  .sheet { position: relative; max-width: 560px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--paper); overflow: hidden; display: flex; flex-direction: column; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
-  .sheet > main { flex: 1; display: flex; flex-direction: column; }
-  .sheet > main > footer { margin-top: auto; }
+  /* 見出しとカードは上下の余白が等しくなるように中央へ（auto マージン。余白がないときは 0 になり、1 画面に収まる）。フッターは下端に固定 */
+  .sheet { position: relative; max-width: 560px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--paper); overflow: hidden; display: flex; flex-direction: column; padding: calc(36px + env(safe-area-inset-top)) 0 calc(56px + env(safe-area-inset-bottom)); }
+  .sheet > header.top { margin-top: auto; }
+  .sheet > main { margin-bottom: auto; }
+  .sheet > footer.foot { position: absolute; left: 20px; right: 20px; bottom: calc(14px + env(safe-area-inset-bottom)); margin: 0; }
   .corner { position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 64px; color: var(--dim); }
   /* 全画面ボタン（右上） */
   .fs { position: fixed; z-index: 40; top: calc(10px + env(safe-area-inset-top)); right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); background: var(--card); display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 rgba(31, 34, 56, .18); }
@@ -107,11 +109,12 @@
   .drawn .squiggle path { stroke-dashoffset: 0; }
 
   /* 見出し */
-  header.top { padding: calc(36px + env(safe-area-inset-top)) 0 0; }
+  header.top { padding: 0; }
   header.top .wrap { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; }
+  header.top .wrap > div:first-child { flex: 1 1 auto; min-width: 0; }   /* 英字の小見出しが折り返せるように。名前の札を押し出さない */
   h1 { font-size: clamp(21px, 6.4vw, 26px); font-weight: 900; line-height: 1.25; letter-spacing: .02em; margin-top: 6px; white-space: nowrap; }
-  h1 small { display: block; font: 500 11px/1 var(--font-en); letter-spacing: .3em; text-transform: uppercase; color: var(--dim); margin-top: 8px; }
-  .who { display: none; flex: none; font: 700 13px/1 var(--font-jp); color: var(--ink); background: var(--butter); border-radius: 999px; padding: 8px 14px; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  h1 small { display: block; font: 500 11px/1.4 var(--font-en); letter-spacing: .26em; text-transform: uppercase; color: var(--dim); margin-top: 6px; white-space: normal; }
+  .who { display: none; flex: 0 1 auto; min-width: 0; font: 700 13px/1 var(--font-jp); color: var(--ink); background: var(--butter); border-radius: 999px; padding: 8px 14px; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .who.show { display: block; }
 
   /* 枠つきのカード（PDF のヒントの表と同じ: クリーム地・インクの線・硬い影） */
@@ -186,7 +189,7 @@
   .cert.pop { animation: pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
   @keyframes pop { from { opacity: 0; transform: scale(.86) translateY(20px); } to { opacity: 1; transform: none; } }
 
-  footer.foot { margin-top: 16px; padding-top: 6px; display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--dim); }
+  footer.foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--dim); }
   .dots { display: flex; align-items: center; gap: 6px; }
   .dots i { width: 8px; height: 8px; border-radius: 999px; background: rgba(31, 34, 56, .22); transition: all .4s ease; }
   .dots i.on { width: 22px; background: var(--accent); }
@@ -367,12 +370,12 @@
       <div class="hint">保存できないときは、画像を長押し。</div>
     </section>
 
-    <footer class="foot">
-      <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span>高専ラボ in GCA2026 秋</span></div>
-      <button type="button" id="reset">はじめから</button>
-    </footer>
 
   </main>
+  <footer class="foot">
+    <div class="dots" id="dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><span>高専ラボ in GCA2026 秋</span></div>
+    <button type="button" id="reset">はじめから</button>
+  </footer>
 </div>
 
 <script>
