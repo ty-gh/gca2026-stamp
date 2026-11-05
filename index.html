@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="theme-color" content="#f4eee3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -64,10 +64,10 @@
   button { cursor: pointer; }
 
   /* 紙 1 枚 */
-  /* 見出しとカードは上下の余白が等しくなるように中央へ（auto マージン。余白がないときは 0 になり、1 画面に収まる）。フッターは下端に固定 */
+  /* 見出しとカードは、空きを上 1 : 下 2 に分けて中央より上に置く（キーボードが出ても合言葉の欄が見える）。空きがないときは 0 になり、1 画面に収まる。フッターは下端に固定 */
   .sheet { position: relative; max-width: 560px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--paper); overflow: hidden; display: flex; flex-direction: column; padding: calc(36px + env(safe-area-inset-top)) 0 calc(56px + env(safe-area-inset-bottom)); }
-  .sheet > header.top { margin-top: auto; }
-  .sheet > main { margin-bottom: auto; }
+  .sheet::before { content: ""; flex: 1 1 0; }
+  .sheet::after  { content: ""; flex: 2 1 0; }
   .sheet > footer.foot { position: absolute; left: 20px; right: 20px; bottom: calc(14px + env(safe-area-inset-bottom)); margin: 0; }
   .corner { position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 64px; color: var(--dim); }
   /* 全画面ボタン（右上） */
