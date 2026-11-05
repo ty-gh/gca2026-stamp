@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e9e2d4">
+<title>導入-9 トーチが集まる — 親子で学ぶ、半導体の世界。</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<!--
+  GCA2026秋 出張 高専ラボ with ICTパーク（11/7・8 泉佐野オチアリーナ）
+  進行台本の「導入-9 集まる（アニメ）」。スライド PDF の 05（レッドストーントーチ）と 06（ブロックのスマホ）の間に再生する 1 ファイル。
+  ローカルでこのファイルを開いて再生する（file:// で動く。サーバー不要、外部ライブラリなし。フォントだけ Google Fonts）
+
+  流れ（約 11 秒。クリック / スペースで始まり、あとは自動。学生Aは黙って待つ）
+    開く    → トーチ 1 本（スライド 05 と同じ絵）
+    クリック → トーチが四方からたくさん飛んできて、12×22 のマス目に並ぶ（約 5 秒）
+            → 1 本ずつブロックに変わって、スライド 06 と同じ「ブロックのスマホ」になる（約 3 秒）
+            → 終わったらスライド 06 へ切り替える（スマホの位置・マス目はスライドと同じ。文字はスライド側で出る）
+  操作: クリック / Space で開始、R / Home でもう一度、F で全画面。URL に ?auto を付けると 2 秒後に自動で始まる
+  見た目はスライドと同じ theme "paper"。ブロックの並びは下の MAP（スライド 06 から写した）
+-->
+<style>
+  :root {
+    --paper: #f4eee3; --ink: #1f2238; --dim: rgba(31, 34, 56, .55);
+    --accent: #3557d4; --peach: #f6a97f; --lilac: #cbb8ef; --butter: #f3d98b; --mint: #8fd3b9; --red: #e2543c; --card: #f8f3ea;
+    --font-en: "Outfit", "Helvetica Neue", Arial, sans-serif;
+    --font-jp: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+    --fit: 1;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #e9e2d4; overflow: hidden; }
+  body { color: var(--ink); font-family: var(--font-jp); line-height: 1.5; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; mix-blend-mode: multiply; opacity: .45;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform: scale(var(--fit)) translate(-50%, -50%); transform-origin: 0 0; background: var(--paper); overflow: hidden; }
+
+  /* トーチ。本体は 24×64（頭 24×22、柄 10×42）。transform で動かす */
+  .torch { position: absolute; left: 0; top: 0; width: 24px; height: 64px; will-change: transform, opacity; }
+  .torch .head { position: absolute; left: 0; top: 0; width: 24px; height: 22px; border-radius: 7px; background: var(--red); border: 3px solid var(--ink); }
+  .torch .head::before { content: ""; position: absolute; left: 3px; top: 3px; width: 6px; height: 5px; border-radius: 2px; background: #f6a97f; }
+  .torch .head::after { content: ""; position: absolute; left: 0; right: 0; top: 12px; height: 2px; background: rgba(31, 34, 56, .35); }
+  .torch .stick { position: absolute; left: 7px; top: 19px; width: 10px; height: 45px; border-radius: 0 0 4px 4px; background: #a0633a; border: 3px solid var(--ink); border-top: 0; }
+  .torch .stick::before { content: ""; position: absolute; left: 1px; top: 2px; width: 2px; height: 36px; background: rgba(31, 34, 56, .18); }
+  /* 最初の 1 本（スライド 05 と同じ大きさ・位置・光） */
+  .hero { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; pointer-events: none; }
+  .hero .glow { position: absolute; left: 800px; top: 330px; width: 0; height: 0; border-radius: 50%; box-shadow: 0 0 0 0 rgba(246, 169, 127, 0); background: radial-gradient(circle, rgba(246, 120, 90, .55) 0%, rgba(246, 169, 127, .35) 35%, rgba(246, 169, 127, 0) 70%); transform: translate(-50%, -50%); width: 560px; height: 560px; transition: opacity 1s ease; }
+  .hero .sparkle { position: absolute; width: 56px; height: 56px; animation: twinkle 3s ease-in-out infinite; transform-origin: center; transition: opacity .6s ease; }
+  .hero .sparkle path { fill: var(--butter); stroke: var(--ink); stroke-width: 5; stroke-linejoin: round; }
+  @keyframes twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(.75) rotate(18deg); } }
+  .stage.go .hero .glow, .stage.go .hero .sparkle { opacity: 0; }
+
+  /* マス目（スライド 06 と同じ位置: 12×22、1 マス 31.6px） */
+  .grid { position: absolute; left: 394px; top: 101px; width: 379px; height: 695px; }
+  .blk { position: absolute; width: 31.6px; height: 31.6px; box-shadow: inset 0 0 0 1px rgba(31, 34, 56, .32); transform: scale(0); opacity: 0; will-change: transform, opacity; }
+  .frame { position: absolute; left: -4px; top: -4px; width: 387px; height: 703px; border: 5px solid var(--ink); border-radius: 12px; opacity: 0; transition: opacity .6s ease; }
+  .stage.done .frame { opacity: 1; }
+
+  /* 字幕・案内 */
+  .cap { position: absolute; z-index: 20; left: 50%; bottom: 44px; transform: translateX(-50%); max-width: 1320px; background: var(--card); border: 4px solid var(--ink); border-radius: 26px; padding: 20px 40px; font-size: 36px; font-weight: 900; line-height: 1.5; text-align: center; box-shadow: 7px 7px 0 rgba(31, 34, 56, .18); opacity: 0; pointer-events: none; }
+  .cap b { color: var(--accent); }
+  .cap.show { animation: capIn .55s cubic-bezier(.3, 1.3, .5, 1) both; }
+  .cap.hide { animation: capOut .5s ease both; }
+  @keyframes capIn { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @keyframes capOut { from { opacity: 1; } to { opacity: 0; } }
+  .who { position: absolute; z-index: 20; right: 36px; top: 34px; font: 700 14px/1 var(--font-en); letter-spacing: .2em; color: var(--dim); }
+  .hint { position: absolute; z-index: 20; left: 36px; bottom: 40px; font-size: 15px; color: var(--dim); letter-spacing: .04em; transition: opacity .4s ease; }
+  .stage.go .hint { opacity: 0; }
+  .hint kbd { font: 700 13px/1 var(--font-en); border: 2px solid rgba(31, 34, 56, .3); border-radius: 6px; padding: 3px 7px; margin-right: 2px; }
+  .nav { position: absolute; z-index: 20; right: 30px; bottom: 30px; display: flex; align-items: center; gap: 10px; }
+  .nav .btn { width: 46px; height: 46px; border-radius: 50%; border: 3px solid var(--ink); background: var(--card); display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 rgba(31, 34, 56, .18); color: var(--ink); }
+  .nav .btn svg { width: 20px; height: 20px; display: block; }
+  .nav .btn .x { display: none; }
+  html.is-fs .nav .btn.fs .o { display: none; } html.is-fs .nav .btn.fs .x { display: block; }
+  @media (prefers-reduced-motion: reduce) { .hero .sparkle { animation: none; } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <div class="hero" id="hero">
+    <div class="glow"></div>
+    <svg class="sparkle" style="left:660px; top:210px" viewBox="-52 -52 104 104"><path d="M0 -44 L11 -11 L44 0 L11 11 L0 44 L-11 11 L-44 0 L-11 -11 Z"/></svg>
+    <svg class="sparkle" style="left:950px; top:170px; width:46px; height:46px; animation-delay:-1.4s" viewBox="-52 -52 104 104"><path d="M0 -44 L11 -11 L44 0 L11 11 L0 44 L-11 11 L-44 0 L-11 -11 Z"/></svg>
+  </div>
+  <div class="grid" id="grid"><div class="frame"></div></div>
+  <div id="swarm"></div>
+  <div class="cap" id="cap"></div>
+  <div class="who">導入-9</div>
+  <div class="hint"><kbd>クリック</kbd> <kbd>Space</kbd> で 集まる　<kbd>R</kbd> もう一度　<kbd>F</kbd> 全画面</div>
+  <div class="nav">
+    <button class="btn re" title="もう一度（R）" aria-label="もう一度"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+    <button class="btn fs" title="全画面（F）" aria-label="全画面">
+      <svg class="o" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      <svg class="x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var W = 1600, H = 900;
+  // スライド 06 のブロックのスマホ（上から 22 行、左から 12 列）
+  var MAP = [
+    'BBBBBBBBBBBB', 'BBBBBKKBBBBB', 'BWKKWWWWKKWB', 'BWWWWWWWWWWB', 'BWOOWLLWYYWB', 'BWOOWLLWYYWB', 'BWWWWWWWWWWB',
+    'BWMMWSSWOOWB', 'BWMMWSSWOOWB', 'BWWWWWWWWWWB', 'BWYYWLLWMMWB', 'BWYYWLLWMMWB', 'BWWWWWWWWWWB',
+    'BWSSSSSSSSWB', 'BWSSSSSSYSWB', 'BWSSSSSSSSWB', 'BWSSSGGSSSWB', 'BWGGGGGGGGWB', 'BWGGGGGGGGWB', 'BWWWWWWWWWWB', 'BBBBBBBBBBBB', 'BBBBBBBBBBBB'
+  ];
+  var COLOR = { B: '#3352c6', K: '#1f2238', W: '#f4eee3', O: '#f6a97f', L: '#cbb8ef', Y: '#f3d98b', M: '#8fd3b9', S: '#b3c6ee', G: '#5aa57e' };
+  var COLS = 12, ROWS = 22, CELL = 31.6, GX = 394, GY = 101;
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var stage = document.getElementById('stage'), swarm = document.getElementById('swarm'), grid = document.getElementById('grid'), cap = document.getElementById('cap');
+
+  function rng(seed) { var a = seed >>> 0; return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  var r = rng(1107);
+
+  // 1 マスに 1 本。トーチの大きさは 24×64 → マスに合わせて 0.42 倍（高さ 27）
+  var S = .42, cells = [];
+  for (var row = 0; row < ROWS; row++) for (var col = 0; col < COLS; col++) {
+    var x = GX + col * CELL + CELL / 2, y = GY + row * CELL + CELL / 2;
+    cells.push({ row: row, col: col, x: x, y: y, c: COLOR[MAP[row][col]], d: Math.hypot(x - 800, y - 450) });
+  }
+  // 最初の 1 本は、スライド 05 のトーチの場所（まん中）。集まるときは、まん中のマスへ
+  var heroCell = cells.slice().sort(function (a, b) { return a.d - b.d; })[0];
+
+  var torches = [], blocks = [];
+  function torchEl() {
+    var t = document.createElement('div'); t.className = 'torch';
+    t.innerHTML = '<div class="head"></div><div class="stick"></div>';
+    return t;
+  }
+  function tf(x, y, s, rot) { return 'translate(' + (x - 12) + 'px,' + (y - 32) + 'px) rotate(' + rot + 'deg) scale(' + s + ')'; }
+
+  function build() {
+    swarm.innerHTML = ''; torches = [];
+    grid.querySelectorAll('.blk').forEach(function (b) { b.remove(); }); blocks = [];
+    cells.forEach(function (c) {
+      var t = torchEl();
+      if (c === heroCell) { t.style.transform = tf(800, 420, 4.6, 0); t.style.opacity = 1; t.className += ' hero-torch'; }
+      else { t.style.opacity = 0; t.style.transform = tf(c.x, c.y, S, 0); }
+      swarm.appendChild(t); torches.push(t);
+      var b = document.createElement('div'); b.className = 'blk';
+      b.style.left = (c.col * CELL) + 'px'; b.style.top = (c.row * CELL) + 'px'; b.style.background = c.c;
+      grid.appendChild(b); blocks.push(b);
+    });
+  }
+  function showCap(html) { cap.innerHTML = html; cap.className = 'cap'; void cap.offsetWidth; cap.className = 'cap show'; }
+  function hideCap() { if (cap.classList.contains('show')) cap.className = 'cap hide'; }
+
+  var started = false, timers = [];
+  function later(ms, fn) { timers.push(setTimeout(fn, reduce ? Math.min(ms, 300) : ms)); }
+  function reset() {
+    timers.forEach(clearTimeout); timers = []; started = false;
+    stage.className = 'stage'; build();
+    showCap('1 個では、何もできない このトーチが…');
+  }
+  function start() {
+    if (started) return; started = true;
+    stage.classList.add('go');
+    showCap('たくさーん 集まると……');
+    var fly = reduce ? 600 : 2200, spread = reduce ? 400 : 3200, ez = 'cubic-bezier(.25,.8,.25,1)';
+    // 集まる順: まん中に近いマスから。飛んでくる場所は画面の外、四方八方
+    var order = cells.map(function (c, i) { return i; }).sort(function (a, b) { return cells[a].d - cells[b].d; });
+    order.forEach(function (idx, k) {
+      var c = cells[idx], t = torches[idx], delay = (k / order.length) * spread + r() * 300;
+      if (c === heroCell) {
+        t.animate([{ transform: tf(800, 420, 4.6, 0) }, { transform: tf(c.x, c.y, S, 0) }], { duration: fly, delay: 200, easing: ez, fill: 'forwards' });
+        return;
+      }
+      var a = r() * Math.PI * 2, R = 1000 + r() * 500, sx = 800 + R * Math.cos(a), sy = 450 + R * Math.sin(a);
+      var mx = (sx + c.x) / 2 + (r() - .5) * 500, my = (sy + c.y) / 2 + (r() - .5) * 500, rot0 = (r() - .5) * 720;
+      t.animate([
+        { transform: tf(sx, sy, S * 1.6, rot0), opacity: 0 },
+        { transform: tf(sx, sy, S * 1.6, rot0), opacity: 1, offset: .05 },
+        { transform: tf(mx, my, S * 1.3, rot0 / 2), opacity: 1, offset: .55 },
+        { transform: tf(c.x, c.y, S, 0), opacity: 1 }
+      ], { duration: fly + r() * 600, delay: delay, easing: ez, fill: 'forwards' });
+    });
+    // 全部そろったら、上の行から順にブロックに変わる
+    var allIn = spread + fly + 900;
+    later(allIn - 600, hideCap);
+    cells.forEach(function (c, i) {
+      var d = allIn + c.row * (reduce ? 20 : 110) + c.col * 14 + r() * 60;
+      later(d, function () {
+        torches[i].animate([{ transform: tf(c.x, c.y, S, 0), opacity: 1 }, { transform: tf(c.x, c.y, S * 1.5, 0), opacity: 0 }], { duration: 320, easing: 'ease-in', fill: 'forwards' });
+        blocks[i].animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.18)', opacity: 1, offset: .6 }, { transform: 'scale(1)', opacity: 1 }], { duration: 420, easing: 'cubic-bezier(.3,1.3,.5,1)', fill: 'forwards' });
+      });
+    });
+    later(allIn + ROWS * (reduce ? 20 : 110) + 700, function () { stage.classList.add('done'); });
+  }
+
+  function fit() { document.documentElement.style.setProperty('--fit', Math.min(innerWidth / W, innerHeight / H)); }
+  addEventListener('resize', fit); fit();
+  function toggleFs() {
+    var d = document, el = d.documentElement;
+    if (!d.fullscreenElement && !d.webkitFullscreenElement) (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+    else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  }
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (e) { document.addEventListener(e, function () { document.documentElement.classList.toggle('is-fs', !!(document.fullscreenElement || document.webkitFullscreenElement)); }); });
+  document.querySelector('.btn.re').addEventListener('click', function (e) { e.stopPropagation(); reset(); });
+  document.querySelector('.btn.fs').addEventListener('click', function (e) { e.stopPropagation(); toggleFs(); });
+  document.body.addEventListener('click', function (e) { if (e.target.closest('.nav')) return; start(); });
+  addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case ' ': case 'Enter': case 'ArrowRight': case 'PageDown': e.preventDefault(); start(); break;
+      case 'r': case 'R': case 'Home': case 'ArrowLeft': case 'Backspace': e.preventDefault(); reset(); break;
+      case 'f': case 'F': toggleFs(); break;
+    }
+  });
+  reset();
+  if (/[?&]auto\b/.test(location.search)) later(2000, start);
+})();
+</script>
+</body>
+</html>
