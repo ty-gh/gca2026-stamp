@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#f4eee3">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="スタンプ集め">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 <title>スタンプ集め</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -60,7 +67,17 @@
   .sheet { position: relative; max-width: 560px; min-height: 100vh; min-height: 100dvh; margin: 0 auto; background: var(--paper); overflow: hidden; display: flex; flex-direction: column; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
   .sheet > main { flex: 1; display: flex; flex-direction: column; }
   .sheet > main > footer { margin-top: auto; }
-  .corner { position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 20px; color: var(--dim); }
+  .corner { position: absolute; top: calc(18px + env(safe-area-inset-top)); right: 64px; color: var(--dim); }
+  /* 全画面ボタン（右上） */
+  .fs { position: fixed; z-index: 40; top: calc(10px + env(safe-area-inset-top)); right: 12px; width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); background: var(--card); display: flex; align-items: center; justify-content: center; box-shadow: 3px 3px 0 rgba(31, 34, 56, .18); }
+  .fs svg { width: 18px; height: 18px; display: block; }
+  .fs .x { display: none; }
+  html.is-fs .fs .o { display: none; } html.is-fs .fs .x { display: block; }
+  html.standalone .fs { display: none; }
+  @media (min-width: 600px) { .fs { right: calc(50% - 280px + 12px); } }
+  /* 一言の知らせ */
+  .toast { position: fixed; z-index: 45; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom)); transform: translateX(-50%); max-width: calc(100% - 32px); background: var(--ink); color: #fff; font-size: 13px; font-weight: 700; padding: 10px 16px; border-radius: 999px; opacity: 0; pointer-events: none; transition: opacity .3s ease; text-align: center; }
+  .toast.show { opacity: 1; }
   .wrap { position: relative; padding: 0 20px; }
 
   .en { font-family: var(--font-en); }
@@ -182,10 +199,12 @@
   @keyframes screenIn  { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
   @keyframes screenOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-24px); } }
   .cover { position: relative; max-width: 560px; min-height: 100vh; margin: 0 auto; background: var(--paper); overflow: hidden; padding: calc(28px + env(safe-area-inset-top)) 24px 36px; display: flex; flex-direction: column; justify-content: center; }
-  .cover .art-box { position: relative; height: 220px; margin: 4px 0 8px; }
+  /* 絵の置き場: 幅に対する比率で高さが決まる（背が低い画面では 60vh までに縮む）。絵は 1 つの SVG なので、はみ出して見出しに被らない */
+  .cover .art-box { position: relative; width: min(100%, 60vh); aspect-ratio: 400 / 230; margin: 4px auto 8px; }
+  .cover .art-box > svg.scene { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
   .cover .deco-bl { left: -230px; bottom: -200px; }
-  .cover .blob-main { width: 220px; height: 220px; left: 50%; top: 5px; margin-left: -110px; background: var(--peach); }
-  .cover .piece { position: absolute; }
+  svg .float, svg .twinkle { transform-box: fill-box; transform-origin: center; }
+  .cover .blob-main { width: 56%; aspect-ratio: 1; left: 22%; top: 2%; background: var(--peach); }
   .cover h1 { font-size: 38px; }
   .cover p { font-size: 16px; color: var(--dim); margin-top: 14px; }
   .cover label { display: block; font: 500 12px/1 var(--font-en); letter-spacing: .32em; text-transform: uppercase; color: var(--accent); margin: 26px 0 8px; }
@@ -263,17 +282,25 @@
   </defs>
 </svg>
 
+<button class="fs" id="fs" type="button" aria-label="全画面" title="全画面">
+  <svg class="o" viewBox="0 0 24 24" fill="none" stroke="#1f2238" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+  <svg class="x" viewBox="0 0 24 24" fill="none" stroke="#1f2238" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+</button>
+<div class="toast" id="toast" role="status"></div>
+
 <section class="screen" id="welcome" aria-label="はじめに">
   <form class="cover" id="welcomeForm" autocomplete="off">
     <div class="blob deco-bl"></div>
     <div class="caps kicker">GCA2026 Autumn · Stamp Rally</div>
     <div class="art-box" aria-hidden="true">
       <div class="blob blob-main"></div>
-      <svg class="art piece float" style="width:36%; left:34%; top:4%" viewBox="0 0 120 120"><use href="#lampart"/></svg>
-      <svg class="art piece float" style="width:38%; left:8%; top:48%; animation-delay:-2s" viewBox="0 0 120 120"><use href="#leverart"/></svg>
-      <svg class="art piece float" style="width:13%; left:72%; top:40%; rotate:14deg; animation-delay:-3.5s" viewBox="0 0 60 120"><use href="#torchart"/></svg>
-      <svg class="art piece twinkle" style="width:12%; left:60%; top:66%; --body: var(--lilac)" viewBox="-52 -52 104 104"><use href="#star"/></svg>
-      <svg class="art piece twinkle" style="width:9%; left:76%; top:12%; animation-delay:-1.3s; --body: var(--butter)" viewBox="-52 -52 104 104"><use href="#star"/></svg>
+      <svg class="scene" viewBox="0 0 400 230">
+        <g class="float"><svg x="140" y="0" width="130" height="130"><use href="#lampart"/></svg></g>
+        <g class="float" style="animation-delay:-2s"><svg x="30" y="102" width="124" height="124"><use href="#leverart"/></svg></g>
+        <g class="float" style="animation-delay:-3.5s"><svg x="296" y="72" width="44" height="88" style="transform: rotate(14deg); transform-box: fill-box; transform-origin: center"><use href="#torchart"/></svg></g>
+        <g class="twinkle"><svg x="236" y="150" width="42" height="42" style="--body: var(--lilac)"><use href="#star" width="42" height="42"/></svg></g>
+        <g class="twinkle" style="animation-delay:-1.3s"><svg x="316" y="16" width="30" height="30" style="--body: var(--butter)"><use href="#star" width="30" height="30"/></svg></g>
+      </svg>
     </div>
     <h1>スタンプ集め<small>スイッチだけで足し算を作る</small></h1>
     <svg class="squiggle" viewBox="0 0 150 14" aria-hidden="true"><path pathLength="1" d="M3 8 C 15 -2, 25 18, 38 8 S 60 -2, 73 8 S 95 18, 108 8 S 130 -2, 147 8"/></svg>
@@ -840,6 +867,31 @@
     document.body.appendChild(a); a.click(); a.remove();
   });
 
+
+  // ---- 全画面 ----
+  var toastTimer = null;
+  function toast(text) {
+    var t = $('toast'); t.textContent = text; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 3200);
+  }
+  var root = document.documentElement;
+  var standalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  if (standalone) root.classList.add('standalone');   // ホーム画面から開いたときは全画面なのでボタンを隠す
+  function isFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  $('fs').addEventListener('click', function () {
+    if (isFs()) {
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (root.requestFullscreen) {
+      root.requestFullscreen({ navigationUI: 'hide' }).catch(function () { toast('この端末では全画面にできません'); });
+    } else if (root.webkitRequestFullscreen) {
+      root.webkitRequestFullscreen();
+    } else {
+      toast('iPhone は 共有 → ホーム画面に追加 で全画面');
+    }
+  });
+  function onFsChange() { root.classList.toggle('is-fs', isFs()); }
+  document.addEventListener('fullscreenchange', onFsChange);
+  document.addEventListener('webkitfullscreenchange', onFsChange);
 
   buildSlots();
   render(); renderWho();
