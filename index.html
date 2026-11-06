@@ -23,6 +23,8 @@
   - 名前は任意（ニックネーム）。端末内にだけ保存。仕様 §1・§8 の「置かない」からの変更点
   - でたらめな入力で当たっても気にしない（見回りがクリアを確かめている）
   - 【余力の余力】押すたびに半加算器の略図が育つ（演出）
+  - 賞状の下に満足度アンケート（7 問・1 分）。送信先は Google フォーム。script 先頭の SURVEY に formResponse の URL と entry の番号を入れる（README「アンケートの送信先」）
+    未設定のときは端末の中にだけ残る。名前は送らない
   見た目: theme "paper"（紙の質感・手描き風の線・ゆっくり形を変える色の形・Outfit＋Zen Maru Gothic）に合わせた。
   色は :root の --paper --ink --accent --peach --lilac --butter で変えられる
   CSS/JS はインライン。外部ライブラリなし。フォントだけ Google Fonts。届かなければ端末のフォントに落ちる
@@ -60,7 +62,7 @@
     mix-blend-mode: multiply; opacity: .5;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; }
 
   /* 紙 1 枚 */
@@ -188,6 +190,41 @@
   .cert .lead { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
   .cert.pop { animation: pop .7s cubic-bezier(.2, 1.4, .4, 1) both; }
   @keyframes pop { from { opacity: 0; transform: scale(.86) translateY(20px); } to { opacity: 1; transform: none; } }
+
+  /* 満足度アンケート（賞状の下。5 つそろったときだけ出る） */
+  .survey { display: none; }
+  .survey.show { display: block; }
+  .survey .lead { font-size: 14px; font-weight: 700; }
+  .survey .lead small { display: block; font-size: 12px; font-weight: 500; color: var(--dim); margin-top: 2px; }
+  .q { margin-top: 18px; }
+  .q .qt { font-size: 15px; font-weight: 700; line-height: 1.5; }
+  .q .qt .tag { display: inline-block; font: 700 10px/1 var(--font-en); letter-spacing: .08em; border-radius: 999px; padding: 3px 7px; margin-left: 6px; vertical-align: 2px; }
+  .q .qt .tag.req { color: #fff; background: var(--red); }
+  .q .qt .tag.opt { color: var(--dim); border: 2px solid var(--line); padding: 1px 6px; }
+  .choices { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .choices label { position: relative; display: block; }
+  .choices input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+  .choices span { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; line-height: 1.2; padding: 8px 13px; border: 3px solid var(--ink); border-radius: 999px; background: var(--card); transition: background .15s ease, color .15s ease, transform .15s ease; }
+  .choices span i { width: 11px; height: 11px; border-radius: 50%; background: var(--c, var(--line)); border: 2px solid var(--ink); flex: none; }
+  .choices input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .choices input:checked + span i { border-color: #fff; }
+  .choices input:focus-visible + span, .scale input:focus-visible + span { box-shadow: 0 0 0 4px rgba(53, 87, 212, .2); }
+  .choices label:active span, .scale label:active span { transform: scale(.96); }
+  /* 1〜5 の丸（ステージの丸と同じ型） */
+  .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
+  .scale label { position: relative; display: block; }
+  .scale input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+  .scale span { display: flex; align-items: center; justify-content: center; width: 100%; aspect-ratio: 1 / 1; max-width: 58px; margin: 0 auto; border: 3px solid var(--ink); border-radius: 50%; background: var(--card); font: 800 22px/1 var(--font-en); transition: background .15s ease, color .15s ease, transform .15s ease; }
+  .scale input:checked + span { background: var(--accent); border-color: var(--accent); color: #fff; transform: scale(1.08); }
+  .scale-ends { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--dim); margin-top: 6px; padding: 0 2px; }
+  textarea { width: 100%; min-height: 84px; resize: vertical; font-size: 16px; line-height: 1.6; padding: 10px 12px; border: 3px solid var(--ink); border-radius: 14px; background: #fff; margin-top: 8px; }
+  textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(53, 87, 212, .15); }
+  .survey .thanks { display: none; text-align: center; padding: 10px 0 4px; }
+  .survey .thanks .big { font-size: 20px; font-weight: 900; margin-top: 8px; }
+  .survey .thanks p { font-size: 13px; color: var(--dim); margin-top: 6px; }
+  .survey .thanks svg { width: 56px; height: 56px; display: block; margin: 0 auto; }
+  .survey.done form { display: none; }
+  .survey.done .thanks { display: block; animation: pop .6s cubic-bezier(.2, 1.4, .4, 1) both; }
 
   footer.foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--dim); }
   .dots { display: flex; align-items: center; gap: 6px; }
@@ -370,6 +407,88 @@
       <div class="hint">保存できないときは、画像を長押し。</div>
     </section>
 
+    <!-- 満足度アンケート: 答えるのは保護者の想定。全部タップで 1 分。送信先は script の SURVEY -->
+    <section class="block card survey" id="survey" aria-labelledby="h-survey">
+      <div class="head"><div class="caps kicker" id="h-survey">Survey — <b>アンケート</b></div><div class="count en">1 min</div></div>
+      <form id="surveyForm" autocomplete="off" novalidate>
+        <div class="lead">今日のワークショップはどうでしたか？<small>答えは次の企画づくりに使います。名前は送られません。</small></div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-sat">
+          <div class="qt" id="q-sat">1. 全体の満足度は？<span class="tag req">必須</span></div>
+          <div class="scale">
+            <label><input type="radio" name="sat" value="1"><span>1</span></label>
+            <label><input type="radio" name="sat" value="2"><span>2</span></label>
+            <label><input type="radio" name="sat" value="3"><span>3</span></label>
+            <label><input type="radio" name="sat" value="4"><span>4</span></label>
+            <label><input type="radio" name="sat" value="5"><span>5</span></label>
+          </div>
+          <div class="scale-ends" aria-hidden="true"><span>不満</span><span>とても満足</span></div>
+        </div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-grade">
+          <div class="qt" id="q-grade">2. 参加したお子さんの学年は？</div>
+          <div class="choices">
+            <label><input type="radio" name="grade" value="未就学"><span>未就学</span></label>
+            <label><input type="radio" name="grade" value="小1・2"><span>小1・2</span></label>
+            <label><input type="radio" name="grade" value="小3・4"><span>小3・4</span></label>
+            <label><input type="radio" name="grade" value="小5・6"><span>小5・6</span></label>
+            <label><input type="radio" name="grade" value="中学生以上"><span>中学生以上</span></label>
+          </div>
+        </div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-level">
+          <div class="qt" id="q-level">3. 内容のむずかしさは？</div>
+          <div class="choices">
+            <label><input type="radio" name="level" value="かんたんすぎた"><span>かんたんすぎた</span></label>
+            <label><input type="radio" name="level" value="ちょうどよかった"><span>ちょうどよかった</span></label>
+            <label><input type="radio" name="level" value="むずかしかった"><span>むずかしかった</span></label>
+          </div>
+        </div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-fav">
+          <div class="qt" id="q-fav">4. いちばんおもしろかったステージは？</div>
+          <div class="choices">
+            <label><input type="radio" name="fav" value="1 NOT あべこべの回路"><span style="--c: var(--lilac)"><i></i>1 あべこべの回路</span></label>
+            <label><input type="radio" name="fav" value="2 OR ことわれない回路"><span style="--c: var(--butter)"><i></i>2 ことわれない回路</span></label>
+            <label><input type="radio" name="fav" value="3 AND がんこな回路"><span style="--c: var(--peach)"><i></i>3 がんこな回路</span></label>
+            <label><input type="radio" name="fav" value="4 XOR ちがいがわかる回路"><span style="--c: var(--mint)"><i></i>4 ちがいがわかる回路</span></label>
+            <label><input type="radio" name="fav" value="5 半加算器 1+1=10！？"><span style="--c: var(--accent)"><i></i>5 1+1=10！？</span></label>
+          </div>
+        </div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-interest">
+          <div class="qt" id="q-interest">5. 半導体やコンピューターのしくみへの興味は？</div>
+          <div class="choices">
+            <label><input type="radio" name="interest" value="とても増えた"><span>とても増えた</span></label>
+            <label><input type="radio" name="interest" value="少し増えた"><span>少し増えた</span></label>
+            <label><input type="radio" name="interest" value="変わらない"><span>変わらない</span></label>
+          </div>
+        </div>
+
+        <div class="q" role="radiogroup" aria-labelledby="q-again">
+          <div class="qt" id="q-again">6. 高専ラボのワークショップに、また参加したいですか？</div>
+          <div class="choices">
+            <label><input type="radio" name="again" value="ぜひ参加したい"><span>ぜひ参加したい</span></label>
+            <label><input type="radio" name="again" value="内容によっては"><span>内容によっては</span></label>
+            <label><input type="radio" name="again" value="あまり"><span>あまり</span></label>
+          </div>
+        </div>
+
+        <div class="q">
+          <label class="qt" for="comment">7. 感想・ご意見があれば<span class="tag opt">任意</span></label>
+          <textarea id="comment" name="comment" maxlength="300" rows="3" placeholder="お子さんの一言でも、スタッフへのメッセージでも。"></textarea>
+        </div>
+
+        <button class="btn block" type="submit">送信する</button>
+        <div class="msg" id="surveyMsg" role="status" aria-live="polite"></div>
+      </form>
+      <div class="thanks">
+        <svg viewBox="-52 -52 104 104" aria-hidden="true" style="--body: var(--butter)"><use href="#star"/></svg>
+        <div class="big">ありがとうございました！</div>
+        <p>いただいた答えは、次のワークショップづくりに使います。<br>今日はおつかれさまでした。</p>
+      </div>
+    </section>
+
 
   </main>
   <footer class="foot">
@@ -394,6 +513,13 @@
   // 合言葉 → 段番号（0 始まり）。全角・小文字・空白は正規化してから見る
   var WORDS = { 'NOT': 0, 'OR': 1, 'AND': 2, 'XOR': 3, '半加算器': 4, 'ハンカサンキ': 4, 'はんかさんき': 4 };
   var KEY = 'gca2026-stamp.v1';
+  // ---- 満足度アンケートの送信先（Google フォーム）。README「アンケートの送信先」の手順で埋める ----
+  // action: フォームの formResponse の URL。entry: 各設問の entry.XXXX（事前入力した URL から拾う）
+  // action が空のあいだは、答えは端末の中にだけ残る（送らない）
+  var SURVEY = {
+    action: '',
+    entry: { sat: '', grade: '', level: '', fav: '', interest: '', again: '', comment: '', date: '' }
+  };
   // ---- スタンプの印影（各段の回路をデフォルメ。構成稿の記号: レバー・トーチ・ランプ・ブロック。赤 1 色） ----
   // すべて currentColor で描く。賞状では色を直書きして canvas に貼る
   function lever(x, y, on) {            // 30×30。出口は (x+30, y+23)
@@ -618,6 +744,7 @@
       $('cert').classList.remove('show');
       $('entry').style.display = '';
     }
+    renderSurvey(n === 5);
   }
 
   function showMsg(kind, text) {
@@ -669,6 +796,7 @@
     save(data);
     certDrawnFor = null;
     msgEl.className = 'msg';
+    $('surveyForm').reset(); $('surveyMsg').className = 'msg';
     render(); renderWho();
     window.scrollTo({ top: 0 });
     showWelcome();
@@ -879,6 +1007,49 @@
   });
 
 
+  // ---- 満足度アンケート ----
+  // 答えは data.survey = { answers, at, sentAt } に残す。送れなかったら（電波が弱いなど）次に開いたときに送り直す
+  var SURVEY_KEYS = ['sat', 'grade', 'level', 'fav', 'interest', 'again', 'comment'];
+  function renderSurvey(show) {
+    var el = $('survey');
+    el.classList.toggle('show', !!show);
+    el.classList.toggle('done', !!(data.survey && data.survey.answers));
+  }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
+  }
+  function sendSurvey() {
+    var sv = data.survey;
+    if (!sv || !sv.answers || sv.sentAt || !SURVEY.action || !window.fetch) return;
+    var body = new URLSearchParams();
+    Object.keys(sv.answers).forEach(function (k) {
+      if (SURVEY.entry[k] && sv.answers[k]) body.append(SURVEY.entry[k], sv.answers[k]);
+    });
+    // Google フォームは他サイトからの POST に CORS の返事をしないので no-cors で投げる（届けば 200、返事は読めない）
+    fetch(SURVEY.action, { method: 'POST', mode: 'no-cors', body: body, keepalive: true })
+      .then(function () { sv.sentAt = new Date().toISOString(); save(data); }, function () { /* 次に開いたとき送り直す */ });
+  }
+  $('surveyForm').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var fd = new FormData(ev.target), a = {}, m = $('surveyMsg');
+    SURVEY_KEYS.forEach(function (k) { a[k] = String(fd.get(k) || '').replace(/\s+/g, ' ').trim().slice(0, 300); });
+    if (!a.sat) {
+      m.className = 'msg show ng'; m.innerHTML = '';
+      var sp = document.createElement('span'); sp.textContent = '満足度（1〜5）を選んでください。'; m.appendChild(sp);
+      window.scrollTo({ top: Math.max(0, layoutTop($('q-sat')) - 24), behavior: 'smooth' });
+      return;
+    }
+    a.date = todayStr();
+    data.survey = { answers: a, at: new Date().toISOString(), sentAt: null };
+    save(data);
+    m.className = 'msg';
+    renderSurvey(true);
+    sendSurvey();
+  });
+  $('surveyForm').addEventListener('change', function () { $('surveyMsg').className = 'msg'; });   // 選び直したら注意文を消す
+  window.addEventListener('online', sendSurvey);
+
   // ---- 全画面 ----
   var toastTimer = null;
   function toast(text) {
@@ -906,6 +1077,7 @@
 
   buildSlots();
   render(); renderWho();
+  sendSurvey();                 // 前回送れなかった答えがあれば送る
   if (!data.started) showWelcome();
   setTimeout(function () { document.documentElement.classList.add('drawn'); }, 100);   // 波線を描く
 })();
