@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>フォームのヘッダー画像</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800&family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<!--
+  Google フォーム（満足度アンケート）のヘッダー画像。1600×400（フォームの推奨サイズ）。
+  index.html と同じ紙のテーマ。撮り方: Playwright で viewport 1600×400・deviceScaleFactor 1 で .header を screenshot（README「アンケートの送信先」）
+-->
+<style>
+  :root {
+    --paper: #f4eee3; --ink: #1f2238; --dim: rgba(31, 34, 56, .55); --accent: #3557d4;
+    --peach: #f6a97f; --lilac: #cbb8ef; --butter: #f3d98b; --mint: #8fd3b9; --card: #f8f3ea;
+    --font-en: "Outfit", "Helvetica Neue", sans-serif;
+    --font-jp: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Noto Sans JP", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #e9e2d4; font-family: var(--font-jp); color: var(--ink); }
+  .header { position: relative; width: 1600px; height: 400px; overflow: hidden; background: var(--paper); }
+  /* 紙の質感 */
+  .header::after {
+    content: ""; position: absolute; inset: 0; z-index: 9; pointer-events: none; mix-blend-mode: multiply; opacity: .5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .blob { position: absolute; border-radius: 47% 53% 42% 58% / 52% 44% 56% 48%; }
+  .b1 { width: 620px; height: 520px; right: 140px; top: -130px; background: var(--peach); border-radius: 58% 42% 51% 49% / 44% 57% 43% 56%; }
+  .b2 { width: 560px; height: 360px; left: -220px; bottom: -200px; background: var(--lilac); }
+  .b3 { width: 300px; height: 220px; right: -120px; bottom: -110px; background: var(--butter); border-radius: 42% 58% 60% 40% / 56% 42% 58% 44%; }
+  /* 手描きの枠 */
+  .frame { position: absolute; inset: 22px; border: 4px solid var(--ink); border-radius: 26px; }
+  .frame::after { content: ""; position: absolute; inset: 9px; border: 1.5px solid var(--ink); border-radius: 18px; opacity: .8; }
+  .text { position: absolute; left: 92px; top: 0; height: 400px; display: flex; flex-direction: column; justify-content: center; z-index: 3; }
+  .caps { font: 500 20px/1 var(--font-en); letter-spacing: .34em; text-transform: uppercase; color: var(--accent); }
+  h1 { font-size: 70px; font-weight: 900; line-height: 1.18; letter-spacing: .02em; margin-top: 14px; white-space: nowrap; }
+  .hl { background: linear-gradient(transparent 64%, var(--butter) 64%); }
+  .sub { display: flex; align-items: center; gap: 18px; margin-top: 18px; }
+  .sub .en { font: 500 18px/1 var(--font-en); letter-spacing: .26em; text-transform: uppercase; color: var(--dim); }
+  .pill { display: inline-block; font: 700 20px/1 var(--font-jp); color: var(--ink); background: var(--butter); border: 3px solid var(--ink); border-radius: 999px; padding: 9px 20px; box-shadow: 4px 4px 0 rgba(31, 34, 56, .18); }
+  .squiggle { display: block; width: 220px; height: 20px; margin-top: 10px; overflow: visible; }
+  .squiggle path { fill: none; stroke: var(--peach); stroke-width: 7; stroke-linecap: round; }
+  .by { position: absolute; right: 70px; bottom: 44px; z-index: 3; text-align: right; }
+  .by .caps { font-size: 14px; }
+  .by b { display: block; font-size: 24px; font-weight: 900; margin-top: 6px; }
+  .by span { display: block; font-size: 15px; color: var(--dim); margin-top: 2px; }
+  .art { position: absolute; z-index: 2; overflow: visible; }
+  .star { fill: var(--body); stroke: var(--ink); stroke-width: 5; stroke-linejoin: round; }
+</style>
+</head>
+<body>
+<div class="header" id="header">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div>
+  <div class="frame"></div>
+
+  <div class="text">
+    <div class="caps">GCA 2026 Autumn · Survey</div>
+    <h1>親子で学ぶ、<span class="hl">半導体の世界。</span></h1>
+    <svg class="squiggle" viewBox="0 0 150 14" aria-hidden="true"><path d="M3 8 C 15 -2, 25 18, 38 8 S 60 -2, 73 8 S 95 18, 108 8 S 130 -2, 147 8"/></svg>
+    <div class="sub"><span class="en">Semiconductor Workshop</span><span class="pill">満足度アンケート</span></div>
+  </div>
+
+  <div class="by">
+    <div class="caps">Presented by</div>
+    <b>出張 高専ラボ with ICTパーク</b>
+    <span>11/7・8 泉佐野 オチアリーナ</span>
+  </div>
+
+  <!-- ランプ・レバー・トーチ・星（index.html と同じ記号） -->
+  <svg class="art" style="left: 1110px; top: 36px; width: 200px; height: 200px; transform: rotate(-6deg)" viewBox="0 0 120 120" aria-hidden="true">
+    <g stroke="#1f2238" stroke-width="5" stroke-linecap="round">
+      <line x1="60" y1="4" x2="60" y2="16"/><line x1="60" y1="104" x2="60" y2="116"/>
+      <line x1="4" y1="60" x2="16" y2="60"/><line x1="104" y1="60" x2="116" y2="60"/>
+      <line x1="20" y1="20" x2="29" y2="29"/><line x1="91" y1="91" x2="100" y2="100"/>
+      <line x1="20" y1="100" x2="29" y2="91"/><line x1="91" y1="29" x2="100" y2="20"/>
+    </g>
+    <circle cx="60" cy="60" r="34" fill="#f3d98b" stroke="#1f2238" stroke-width="5"/>
+  </svg>
+  <svg class="art" style="left: 1350px; top: 84px; width: 170px; height: 170px; transform: rotate(5deg)" viewBox="0 0 120 120" aria-hidden="true">
+    <rect x="12" y="74" width="96" height="30" rx="8" fill="#9aa0ad" stroke="#1f2238" stroke-width="5"/>
+    <rect x="12" y="74" width="96" height="10" rx="5" fill="#b4b9c4" opacity=".8"/>
+    <circle cx="94" cy="92" r="4" fill="#e2543c"/>
+    <line x1="58" y1="82" x2="90" y2="30" stroke="#1f2238" stroke-width="15" stroke-linecap="round"/>
+    <line x1="58" y1="82" x2="90" y2="30" stroke="#a86f3a" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="92" cy="26" r="12" fill="#b6bac4" stroke="#1f2238" stroke-width="5"/>
+    <circle cx="88" cy="22" r="3" fill="#fff" opacity=".8"/>
+  </svg>
+  <svg class="art" style="left: 1300px; top: 22px; width: 52px; height: 104px; transform: rotate(14deg)" viewBox="0 0 60 120" aria-hidden="true">
+    <rect x="22" y="36" width="16" height="78" rx="6" fill="#a86f3a" stroke="#1f2238" stroke-width="5"/>
+    <line x1="30" y1="44" x2="30" y2="106" stroke="#7d4f24" stroke-width="3" stroke-linecap="round"/>
+    <rect x="10" y="6" width="40" height="38" rx="9" fill="#e2543c" stroke="#1f2238" stroke-width="5"/>
+    <rect x="14" y="30" width="32" height="5" fill="#c43f2c" opacity=".8"/>
+    <rect x="18" y="14" width="10" height="8" rx="3" fill="#ffd9c4"/>
+  </svg>
+  <svg class="art" style="left: 1290px; top: 160px; width: 44px; height: 44px; --body: var(--lilac); transform: rotate(12deg)" viewBox="-52 -52 104 104" aria-hidden="true"><path class="star" d="M0 -48 L12 -12 L48 0 L12 12 L0 48 L-12 12 L-48 0 L-12 -12 Z"/></svg>
+  <svg class="art" style="left: 1520px; top: 40px; width: 36px; height: 36px; --body: var(--butter); transform: rotate(-10deg)" viewBox="-52 -52 104 104" aria-hidden="true"><path class="star" d="M0 -48 L12 -12 L48 0 L12 12 L0 48 L-12 12 L-48 0 L-12 -12 Z"/></svg>
+  <svg class="art" style="left: 1040px; top: 236px; width: 40px; height: 40px; --body: var(--accent); transform: rotate(20deg)" viewBox="-52 -52 104 104" aria-hidden="true"><path class="star" d="M0 -48 L12 -12 L48 0 L12 12 L0 48 L-12 12 L-48 0 L-12 -12 Z"/></svg>
+  <svg class="art" style="left: 1150px; top: 258px; width: 28px; height: 28px; --body: var(--peach)" viewBox="-52 -52 104 104" aria-hidden="true"><path class="star" d="M0 -48 L12 -12 L48 0 L12 12 L0 48 L-12 12 L-48 0 L-12 -12 Z"/></svg>
+</div>
+</body>
+</html>

@@ -23,8 +23,8 @@
   - 名前は任意（ニックネーム）。端末内にだけ保存。仕様 §1・§8 の「置かない」からの変更点
   - でたらめな入力で当たっても気にしない（見回りがクリアを確かめている）
   - 【余力の余力】押すたびに半加算器の略図が育つ（演出）
-  - 賞状の下に満足度アンケート（7 問・1 分）。送信先は Google フォーム。script 先頭の SURVEY に formResponse の URL と entry の番号を入れる（README「アンケートの送信先」）
-    未設定のときは端末の中にだけ残る。名前は送らない
+  - 賞状の下に満足度アンケート（7 問・1 分）。送信先は Google フォーム。script 先頭の SURVEY に formResponse の URL と entry の番号（README「アンケートの送信先」）
+    設問・選択肢の文字はフォームと同じにする。名前は送らない
   見た目: theme "paper"（紙の質感・手描き風の線・ゆっくり形を変える色の形・Outfit＋Zen Maru Gothic）に合わせた。
   色は :root の --paper --ink --accent --peach --lilac --butter で変えられる
   CSS/JS はインライン。外部ライブラリなし。フォントだけ Google Fonts。届かなければ端末のフォントに落ちる
@@ -413,20 +413,20 @@
       <form id="surveyForm" autocomplete="off" novalidate>
         <div class="lead">今日のワークショップはどうでしたか？<small>答えは次の企画づくりに使います。名前は送られません。</small></div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-sat">
-          <div class="qt" id="q-sat">1. 全体の満足度は？<span class="tag req">必須</span></div>
+        <div class="q" role="radiogroup" aria-labelledby="q-sat" id="qbox-sat">
+          <div class="qt" id="q-sat">1. 全体を通して、どれくらい満足しましたか？<span class="tag req">必須</span></div>
           <div class="scale">
-            <label><input type="radio" name="sat" value="1"><span>1</span></label>
-            <label><input type="radio" name="sat" value="2"><span>2</span></label>
-            <label><input type="radio" name="sat" value="3"><span>3</span></label>
-            <label><input type="radio" name="sat" value="4"><span>4</span></label>
-            <label><input type="radio" name="sat" value="5"><span>5</span></label>
+            <label><input type="radio" name="sat" value="とても不満"><span>1</span></label>
+            <label><input type="radio" name="sat" value="不満"><span>2</span></label>
+            <label><input type="radio" name="sat" value="どちらでもない"><span>3</span></label>
+            <label><input type="radio" name="sat" value="満足"><span>4</span></label>
+            <label><input type="radio" name="sat" value="とても満足"><span>5</span></label>
           </div>
-          <div class="scale-ends" aria-hidden="true"><span>不満</span><span>とても満足</span></div>
+          <div class="scale-ends" aria-hidden="true"><span>とても不満</span><span>とても満足</span></div>
         </div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-grade">
-          <div class="qt" id="q-grade">2. 参加したお子さんの学年は？</div>
+        <div class="q" role="radiogroup" aria-labelledby="q-grade" id="qbox-grade">
+          <div class="qt" id="q-grade">2. 参加したお子さんの学年は？<span class="tag req">必須</span></div>
           <div class="choices">
             <label><input type="radio" name="grade" value="未就学"><span>未就学</span></label>
             <label><input type="radio" name="grade" value="小1・2"><span>小1・2</span></label>
@@ -436,46 +436,46 @@
           </div>
         </div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-level">
-          <div class="qt" id="q-level">3. 内容のむずかしさは？</div>
+        <div class="q" role="radiogroup" aria-labelledby="q-level" id="qbox-level">
+          <div class="qt" id="q-level">3. 内容のむずかしさはどうでしたか？<span class="tag req">必須</span></div>
           <div class="choices">
-            <label><input type="radio" name="level" value="かんたんすぎた"><span>かんたんすぎた</span></label>
-            <label><input type="radio" name="level" value="ちょうどよかった"><span>ちょうどよかった</span></label>
+            <label><input type="radio" name="level" value="かんたん"><span>かんたん</span></label>
+            <label><input type="radio" name="level" value="ちょうどよい"><span>ちょうどよい</span></label>
             <label><input type="radio" name="level" value="むずかしかった"><span>むずかしかった</span></label>
           </div>
         </div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-fav">
-          <div class="qt" id="q-fav">4. いちばんおもしろかったステージは？</div>
+        <div class="q" role="radiogroup" aria-labelledby="q-fav" id="qbox-fav">
+          <div class="qt" id="q-fav">4. 一番面白かったステージはどれですか？<span class="tag req">必須</span></div>
           <div class="choices">
-            <label><input type="radio" name="fav" value="1 NOT あべこべの回路"><span style="--c: var(--lilac)"><i></i>1 あべこべの回路</span></label>
-            <label><input type="radio" name="fav" value="2 OR ことわれない回路"><span style="--c: var(--butter)"><i></i>2 ことわれない回路</span></label>
-            <label><input type="radio" name="fav" value="3 AND がんこな回路"><span style="--c: var(--peach)"><i></i>3 がんこな回路</span></label>
-            <label><input type="radio" name="fav" value="4 XOR ちがいがわかる回路"><span style="--c: var(--mint)"><i></i>4 ちがいがわかる回路</span></label>
-            <label><input type="radio" name="fav" value="5 半加算器 1+1=10！？"><span style="--c: var(--accent)"><i></i>5 1+1=10！？</span></label>
+            <label><input type="radio" name="fav" value="① あべこべの回路（NOT回路）"><span style="--c: var(--lilac)"><i></i>① あべこべの回路（NOT）</span></label>
+            <label><input type="radio" name="fav" value="② ことわれない回路（OR回路）"><span style="--c: var(--butter)"><i></i>② ことわれない回路（OR）</span></label>
+            <label><input type="radio" name="fav" value="③ がんこな回路（AND回路）"><span style="--c: var(--peach)"><i></i>③ がんこな回路（AND）</span></label>
+            <label><input type="radio" name="fav" value="④ ちがいがわかる回路（XOR回路）"><span style="--c: var(--mint)"><i></i>④ ちがいがわかる回路（XOR）</span></label>
+            <label><input type="radio" name="fav" value="⑤ 1 + 1 = 10 ！？（半加算器）"><span style="--c: var(--accent)"><i></i>⑤ 1+1=10！？（半加算器）</span></label>
           </div>
         </div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-interest">
-          <div class="qt" id="q-interest">5. 半導体やコンピューターのしくみへの興味は？</div>
+        <div class="q" role="radiogroup" aria-labelledby="q-interest" id="qbox-interest">
+          <div class="qt" id="q-interest">5. 半導体やコンピュータの仕組みへの興味は湧きましたか？<span class="tag req">必須</span></div>
           <div class="choices">
-            <label><input type="radio" name="interest" value="とても増えた"><span>とても増えた</span></label>
-            <label><input type="radio" name="interest" value="少し増えた"><span>少し増えた</span></label>
+            <label><input type="radio" name="interest" value="湧いた"><span>湧いた</span></label>
+            <label><input type="radio" name="interest" value="少し湧いた"><span>少し湧いた</span></label>
             <label><input type="radio" name="interest" value="変わらない"><span>変わらない</span></label>
           </div>
         </div>
 
-        <div class="q" role="radiogroup" aria-labelledby="q-again">
-          <div class="qt" id="q-again">6. 高専ラボのワークショップに、また参加したいですか？</div>
+        <div class="q" role="radiogroup" aria-labelledby="q-again" id="qbox-again">
+          <div class="qt" id="q-again">6. またこのようなワークショップに参加したいですか？<span class="tag req">必須</span></div>
           <div class="choices">
-            <label><input type="radio" name="again" value="ぜひ参加したい"><span>ぜひ参加したい</span></label>
-            <label><input type="radio" name="again" value="内容によっては"><span>内容によっては</span></label>
+            <label><input type="radio" name="again" value="参加したい"><span>参加したい</span></label>
+            <label><input type="radio" name="again" value="マイクラなら参加したい"><span>マイクラなら参加したい</span></label>
             <label><input type="radio" name="again" value="あまり"><span>あまり</span></label>
           </div>
         </div>
 
         <div class="q">
-          <label class="qt" for="comment">7. 感想・ご意見があれば<span class="tag opt">任意</span></label>
+          <label class="qt" for="comment">7. 感想やご意見があればご記入ください。<span class="tag opt">任意</span></label>
           <textarea id="comment" name="comment" maxlength="300" rows="3" placeholder="お子さんの一言でも、スタッフへのメッセージでも。"></textarea>
         </div>
 
@@ -513,12 +513,12 @@
   // 合言葉 → 段番号（0 始まり）。全角・小文字・空白は正規化してから見る
   var WORDS = { 'NOT': 0, 'OR': 1, 'AND': 2, 'XOR': 3, '半加算器': 4, 'ハンカサンキ': 4, 'はんかさんき': 4 };
   var KEY = 'gca2026-stamp.v1';
-  // ---- 満足度アンケートの送信先（Google フォーム）。README「アンケートの送信先」の手順で埋める ----
-  // action: フォームの formResponse の URL。entry: 各設問の entry.XXXX（事前入力した URL から拾う）
-  // action が空のあいだは、答えは端末の中にだけ残る（送らない）
+  // ---- 満足度アンケートの送信先（Google フォーム）。設問・選択肢の文字はフォームと同じにする（違うと受け付けられない） ----
+  // 変えるときは README「アンケートの送信先」
   var SURVEY = {
-    action: '',
-    entry: { sat: '', grade: '', level: '', fav: '', interest: '', again: '', comment: '', date: '' }
+    action: 'https://docs.google.com/forms/d/e/1FAIpQLSdu48PIn7Vlc2teJzvqIsePgs9OTqvTcB61-3HmU-RPczldLA/formResponse',
+    entry: { sat: 'entry.1880155309', grade: 'entry.1703521399', level: 'entry.699755161', fav: 'entry.1103249294',
+             interest: 'entry.1683250664', again: 'entry.1553596668', comment: 'entry.549144859' }
   };
   // ---- スタンプの印影（各段の回路をデフォルメ。構成稿の記号: レバー・トーチ・ランプ・ブロック。赤 1 色） ----
   // すべて currentColor で描く。賞状では色を直書きして canvas に貼る
@@ -1015,14 +1015,11 @@
     el.classList.toggle('show', !!show);
     el.classList.toggle('done', !!(data.survey && data.survey.answers));
   }
-  function todayStr() {
-    var d = new Date();
-    return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
-  }
   function sendSurvey() {
     var sv = data.survey;
     if (!sv || !sv.answers || sv.sentAt || !SURVEY.action || !window.fetch) return;
     var body = new URLSearchParams();
+    body.append('pageHistory', '0');            // 1 ページのフォーム
     Object.keys(sv.answers).forEach(function (k) {
       if (SURVEY.entry[k] && sv.answers[k]) body.append(SURVEY.entry[k], sv.answers[k]);
     });
@@ -1034,13 +1031,16 @@
     ev.preventDefault();
     var fd = new FormData(ev.target), a = {}, m = $('surveyMsg');
     SURVEY_KEYS.forEach(function (k) { a[k] = String(fd.get(k) || '').replace(/\s+/g, ' ').trim().slice(0, 300); });
-    if (!a.sat) {
+    // 1〜6 はフォーム側で必須。空のまま送ると受け付けられないので、ここで止める
+    var missing = SURVEY_KEYS.filter(function (k) { return k !== 'comment' && !a[k]; });
+    if (missing.length) {
       m.className = 'msg show ng'; m.innerHTML = '';
-      var sp = document.createElement('span'); sp.textContent = '満足度（1〜5）を選んでください。'; m.appendChild(sp);
-      window.scrollTo({ top: Math.max(0, layoutTop($('q-sat')) - 24), behavior: 'smooth' });
+      var sp = document.createElement('span');
+      sp.textContent = missing.map(function (k) { return $('q-' + k).textContent.split('.')[0]; }).join('・') + ' を選んでください。';
+      m.appendChild(sp);
+      window.scrollTo({ top: Math.max(0, layoutTop($('qbox-' + missing[0])) - 24), behavior: 'smooth' });
       return;
     }
-    a.date = todayStr();
     data.survey = { answers: a, at: new Date().toISOString(), sentAt: null };
     save(data);
     m.className = 'msg';
